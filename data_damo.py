@@ -20,7 +20,7 @@ def show_data(file):
         with open(temp_file_path, "wb") as temp_file:
             temp_file.write(file.getvalue())
 
-    st.success("文件上传成功!")
+    st.success("正在拼命加载文件.............................")
 
     # 读取 JSONL 文件
     data = read_jsonl(temp_file_path)
