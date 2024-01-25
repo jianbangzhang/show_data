@@ -1,10 +1,9 @@
 import streamlit as st
-import pandas as pd
 import json
 import os
 
+cur_path = os.path.dirname(os.path.abspath(__file__))
 
-cur_path=os.getcwd()
 def read_jsonl(file_path):
     data = []
     with open(file_path, 'r', encoding="utf-8") as file:
@@ -13,9 +12,13 @@ def read_jsonl(file_path):
             data.append(json_object)
     return data
 
+
+st.set_page_config(layout="wide")
+
+
 def show_data(file):
     # 保存上传的文件到本地临时文件
-    if isinstance(file,str):
+    if isinstance(file, str):
         temp_file_path = file
     else:
         temp_file_path = "temp.jsonl"
@@ -41,8 +44,6 @@ def show_data(file):
         st.write(f"{len(data) // 2 + 1}th-{len(data)}th数据:")
         st.write(data[len(data) // 2:])
 
-    # 删除临时文件
-    os.remove(temp_file_path)
 
 
 def main():
@@ -55,13 +56,14 @@ def main():
         # 选择上传的 JSONL 文件
         uploaded_file = st.file_uploader("上传 JSONL 文件", type=["jsonl"])
         if uploaded_file is not None:
-           show_data(uploaded_file)
+            show_data(uploaded_file)
     elif upload_option == "加载默认文件":
         # 加载默认 JSONL 文件
-        default_file_path = os.path.join(cur_path,"dev.jsonl")
+        default_file_path = os.path.join(cur_path, "dev.jsonl")
         show_data(default_file_path)
     else:
         raise NotImplementedError
 
 if __name__ == "__main__":
     main()
+
