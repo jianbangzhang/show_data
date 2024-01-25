@@ -3,6 +3,8 @@ import pandas as pd
 import json
 import os
 
+
+cur_path=os.getcwd()
 def read_jsonl(file_path):
     data = []
     with open(file_path, 'r', encoding="utf-8") as file:
@@ -56,7 +58,7 @@ def main():
            show_data(uploaded_file)
     elif upload_option == "加载默认文件":
         # 加载默认 JSONL 文件
-        default_file_path = "dev.jsonl"
+        default_file_path = os.path.join(cur_path,"dev.jsonl")
         show_data(default_file_path)
     else:
         raise NotImplementedError
