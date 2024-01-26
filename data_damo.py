@@ -1,19 +1,9 @@
 import streamlit as st
-import json
 import os
-
-cur_path = os.path.dirname(os.path.abspath(__file__))
-
-def read_jsonl(file_path):
-    data = []
-    with open(file_path, 'r', encoding="utf-8") as file:
-        for line in file:
-            json_object = json.loads(line)
-            data.append(json_object)
-    return data
+from utils import read_jsonl
 
 
-st.set_page_config(layout="wide")
+
 
 
 def show_data(file):
@@ -46,24 +36,6 @@ def show_data(file):
 
 
 
-def main():
-    st.title("展示MS-Agent-Bench数据集")
-
-    # 选择上传文件或加载默认文件
-    upload_option = st.radio("选择数据源", ["上传jsonl文件", "加载默认文件"])
-
-    if upload_option == "上传jsonl文件":
-        # 选择上传的 JSONL 文件
-        uploaded_file = st.file_uploader("上传 JSONL 文件", type=["jsonl"])
-        if uploaded_file is not None:
-            show_data(uploaded_file)
-    elif upload_option == "加载默认文件":
-        # 加载默认 JSONL 文件
-        default_file_path = os.path.join(cur_path, "dev.jsonl")
-        show_data(default_file_path)
-    else:
-        raise NotImplementedError
-
-if __name__ == "__main__":
-    main()
+def show(default_file_path):
+    show_data(default_file_path)
 
