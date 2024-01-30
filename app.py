@@ -46,7 +46,7 @@ def main():
             st.write(f"{int(data_id)}th处理后数据:")
             st.write(post_data)
             st.write("测试阶段数据处理......")
-            test_data=get_ms_tool_dataset_test(file)
+            test_data=get_ms_tool_dataset_test(file,data_id)
             st.write(test_data)
         else:
             st.write("请先选择上传文件............")

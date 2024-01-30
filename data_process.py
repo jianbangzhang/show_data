@@ -82,14 +82,14 @@ def get_ms_tool_dataset_train(file_path:str,data_index:int) -> tuple:
 
 
 
-def get_ms_tool_dataset_test(dataset_name_or_file):
+def get_ms_tool_dataset_test(file_path:str,data_index:int):
     # ms_tool_dataset: for train
     # each data may contain multiple segments, they are organized as different samples
     all_inputs_str = []
     all_labels_str = []
 
-    if os.path.isfile(dataset_name_or_file):
-        dataset_json_file=dataset_name_or_file
+    if os.path.isfile(file_path):
+        dataset_json_file=file_path
         with open(dataset_json_file, 'r') as f:
             if dataset_json_file.endswith('.json'):
                 origin_data = json.load(f)
@@ -100,7 +100,9 @@ def get_ms_tool_dataset_test(dataset_name_or_file):
     else:
         raise ValueError("数据集不存在！")
 
-    for d in origin_data:
+    for i, d in enumerate(origin_data):
+        if data_index != i:
+            continue
         content = d['conversations']
         if isinstance(content, str):
             content = ast.literal_eval(content)
