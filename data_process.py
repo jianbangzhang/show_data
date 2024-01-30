@@ -1,14 +1,10 @@
 import ast
 import re
 from utils import read_jsonl
+import json
+import os
 
-
-
-
-
-
-
-def get_ms_tool_dataset(file_path:str,data_index:int) -> tuple:
+def get_ms_tool_dataset_train(file_path:str,data_index:int) -> tuple:
     # ms_tool_dataset: for train
     # each data may contain multiple segments, they are organized as a list
     # and split by flag. 0 for user input/ tool execute result..., 1 for label
@@ -81,6 +77,84 @@ def get_ms_tool_dataset(file_path:str,data_index:int) -> tuple:
         'inputs': all_inputs_str,
         'flags': all_inputs_flag
     }
+
     return raw_data,post_data
 
 
+
+def get_ms_tool_dataset_test(dataset_name_or_file):
+    # ms_tool_dataset: for train
+    # each data may contain multiple segments, they are organized as different samples
+    all_inputs_str = []
+    all_labels_str = []
+
+    if os.path.isfile(dataset_name_or_file):
+        dataset_json_file=dataset_name_or_file
+        with open(dataset_json_file, 'r') as f:
+            if dataset_json_file.endswith('.json'):
+                origin_data = json.load(f)
+            elif dataset_json_file.endswith('.jsonl'):
+                origin_data = []
+                for line in f:
+                    origin_data.append(json.loads(line))
+    else:
+        raise ValueError("数据集不存在！")
+
+    for d in origin_data:
+        content = d['conversations']
+        if isinstance(content, str):
+            content = ast.literal_eval(content)
+
+        # ilegal data
+        if len(content) == 0 or content[0]['from'] != 'system':
+            continue
+
+        system_str = '<|system|>:' + content[0]['value']
+
+        input_str = system_str
+
+        for i in range(len(content) // 2):
+            if len(content[2 * i + 2]['value']) == 0:
+                continue
+
+            assert content[2 * i + 1]['from'] == 'user'
+            assert content[2 * i + 2]['from'] == 'assistant'
+            # user input
+            input_str += ('\n\n<|user|>:' + content[2 * i + 1]['value'])
+
+            # assistant response
+            origin_response_str = '\n\n<|assistant|>:' + content[2 * i
+                                                                 + 2]['value']
+
+            idx2 = 0
+
+            iter1 = re.finditer(r'<\|startofexec\|>', origin_response_str)
+            iter2 = re.finditer(r'<\|endofexec\|>', origin_response_str)
+
+            for i1, i2 in zip(iter1, iter2):
+                idx1 = i1.start()
+
+                # llm response
+                llm_response = origin_response_str[idx2:idx1]
+                all_inputs_str.append(input_str)
+                all_labels_str.append(llm_response)
+
+                input_str += llm_response
+
+                idx2 = i2.end()
+
+                # exec result
+                exec_result = origin_response_str[idx1:idx2]
+                input_str += exec_result
+
+            # summarize
+            if idx2 != len(origin_response_str):
+                final_summarize = origin_response_str[idx2:]
+                all_inputs_str.append(input_str)
+                all_labels_str.append(final_summarize)
+
+    dataset = {
+        'inputs': all_inputs_str,
+        'labels': all_labels_str
+    }
+    return dataset

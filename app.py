@@ -2,7 +2,7 @@ import streamlit as st
 import os
 from data_damo import show
 from data_descript import describe_data
-from data_process import get_ms_tool_dataset
+from data_process import get_ms_tool_dataset_test,get_ms_tool_dataset_train
 from utils import choose_dataset
 
 
@@ -40,11 +40,14 @@ def main():
             data_id=1
 
         if file is not None:
-            raw_data,post_data=get_ms_tool_dataset(file,data_id)
+            raw_data,post_data=get_ms_tool_dataset_train(file,data_id)
             st.write(f"{int(data_id)}th原始数据:")
             st.write(raw_data)
             st.write(f"{int(data_id)}th处理后数据:")
             st.write(post_data)
+            st.write("测试阶段数据处理......")
+            test_data=get_ms_tool_dataset_test(file)
+            st.write(test_data)
         else:
             st.write("请先选择上传文件............")
     else:
