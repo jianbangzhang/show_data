@@ -159,4 +159,7 @@ def get_ms_tool_dataset_test(file_path:str,data_index:int):
         'inputs': all_inputs_str,
         'labels': all_labels_str
     }
-    return dataset
+    input_label_list=[]
+    for inp,label in list(zip(all_inputs_str,all_labels_str)):
+        input_label_list.append({"input":inp,"label":label})
+    return dataset,input_label_list
