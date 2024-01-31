@@ -3,6 +3,10 @@ import re
 from utils import read_jsonl
 import json
 import os
+from copy import deepcopy
+
+IGNORE_INDEX=-100
+
 
 def get_ms_tool_dataset_train(file_path:str,data_index:int) -> tuple:
     # ms_tool_dataset: for train
@@ -78,7 +82,16 @@ def get_ms_tool_dataset_train(file_path:str,data_index:int) -> tuple:
         'flags': all_inputs_flag
     }
 
-    return raw_data,post_data
+    labels = []
+    for inp, flag in zip(post_data["inputs"], post_data["flags"]):
+
+        labels.append(deepcopy(inp) if flag == 1 else len(list(inp))
+                                                   * "x")
+
+    input_label_list = []
+    for inp, label in list(zip(post_data["inputs"], labels)):
+        input_label_list.append({"input": inp, "label": label})
+    return raw_data,post_data,input_label_list
 
 
 
