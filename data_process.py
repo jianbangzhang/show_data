@@ -83,8 +83,9 @@ def get_ms_tool_dataset_train(file_path:str,data_index:int) -> tuple:
     }
 
     input_label_list = []
-    for inp, flag in list(zip(all_inputs_str, all_inputs_flag)):
-        input_label_list.append({"input": inp, "label": flag})
+    for inp, flag in list(zip(all_inputs_str[0], all_inputs_flag[0])):
+        label=deepcopy(inp) if flag==1 else "IGNORE"
+        input_label_list.append({"input": inp, "label": label})
     return raw_data,post_data,input_label_list
 
 
